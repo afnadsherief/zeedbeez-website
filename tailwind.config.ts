@@ -41,8 +41,8 @@ const config: Config = {
         content: {
           primary: 'rgba(255,255,255,0.96)',
           secondary: 'rgba(255,255,255,0.64)',
-          tertiary: 'rgba(255,255,255,0.36)',
-          disabled: 'rgba(255,255,255,0.20)',
+          tertiary: 'rgba(255,255,255,0.52)', // WCAG AA 5.65:1 on void. Was 0.36 (3.23:1, FAIL).
+          disabled: 'rgba(255,255,255,0.48)', // WCAG AA 5.00:1 on void. Was 0.20 (1.73:1, FAIL).
         },
       },
       fontFamily: {
