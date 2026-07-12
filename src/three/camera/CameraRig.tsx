@@ -27,6 +27,7 @@ import { easing } from 'maath'
 import type * as THREE from 'three'
 import { CAMERA_MODES, type CameraModeName } from './modes'
 import type { ScrollProgress } from '@/types'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 interface CameraRigProps {
   /** Predefined camera mode from CAMERA_MODES */
@@ -46,6 +47,11 @@ interface CameraRigProps {
  * All camera mutation happens inside useFrame (the R3F render loop) rather
  * than in an effect — this is the correct imperative-mutation boundary for
  * three.js objects and keeps the component compiler-safe.
+ *
+ * Per docs/17_ACCESSIBILITY.md: pointer-driven parallax is continuous,
+ * input-linked motion and is disabled for prefers-reduced-motion users.
+ * The one-time settle-to-mode transition on mount/mode-change is not
+ * continuous idle motion and is left enabled.
  */
 export function CameraRig({
   mode,
@@ -55,6 +61,7 @@ export function CameraRig({
 }: CameraRigProps) {
   const { camera, pointer } = useThree()
   const lastMode = useRef<CameraModeName | null>(null)
+  const prefersReduced = useReducedMotion()
 
   useFrame((_state, delta) => {
     const config = CAMERA_MODES[mode]
@@ -72,9 +79,9 @@ export function CameraRig({
 
     const [tx, ty, tz] = config.position
 
-    // Subtle pointer parallax
-    const px = pointer.x * parallaxStrength
-    const py = pointer.y * parallaxStrength
+    // Subtle pointer parallax — disabled under reduced motion
+    const px = prefersReduced ? 0 : pointer.x * parallaxStrength
+    const py = prefersReduced ? 0 : pointer.y * parallaxStrength
 
     // Smooth damp to target with parallax offset
     easing.damp3(camera.position, [tx + px, ty + py, tz], damping, delta)

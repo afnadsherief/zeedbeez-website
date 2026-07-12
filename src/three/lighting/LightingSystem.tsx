@@ -16,6 +16,7 @@ import { Environment } from '@react-three/drei'
 import type { DirectionalLight } from 'three'
 import { LIGHTING_PRESETS, type LightingPresetName } from './presets'
 import { getQualityTier } from '@/three/performance/qualityManager'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 interface LightingSystemProps {
   readonly preset: LightingPresetName
@@ -30,13 +31,15 @@ interface LightingSystemProps {
 export function LightingSystem({ preset }: LightingSystemProps) {
   const config = LIGHTING_PRESETS[preset]
   const tier = getQualityTier()
+  const prefersReduced = useReducedMotion()
   const keyLightRef = useRef<DirectionalLight>(null!)
 
-  // Subtle key light animation — breathing life into still scenes
+  // Subtle key light animation — breathing life into still scenes.
+  // Per docs/17_ACCESSIBILITY.md: stopped for prefers-reduced-motion users;
+  // the light still renders at a fixed intensity.
   useFrame(({ clock }) => {
-    if (keyLightRef.current && tier !== 'low') {
-      keyLightRef.current.intensity = 1.4 + Math.sin(clock.elapsedTime * 0.4) * 0.05
-    }
+    if (!keyLightRef.current || tier === 'low' || prefersReduced) return
+    keyLightRef.current.intensity = 1.4 + Math.sin(clock.elapsedTime * 0.4) * 0.05
   })
 
   return (

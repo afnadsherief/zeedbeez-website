@@ -13,6 +13,7 @@ import { useFrame } from '@react-three/fiber'
 import { MeshTransmissionMaterial, Float } from '@react-three/drei'
 import type { Mesh } from 'three'
 import { getQualityTier } from '@/three/performance/qualityManager'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 interface HeroBottleProps {
   /** Scroll progress 0-1 drives rotation and position */
@@ -26,9 +27,21 @@ interface HeroBottleProps {
 export function HeroBottle({ scrollProgress = 0 }: HeroBottleProps) {
   const meshRef = useRef<Mesh>(null!)
   const tier = getQualityTier()
+  const prefersReduced = useReducedMotion()
 
   useFrame(({ clock }) => {
     if (!meshRef.current) return
+
+    // Per docs/17_ACCESSIBILITY.md: continuous idle motion (rotation,
+    // levitation) must stop for prefers-reduced-motion users. The bottle
+    // still renders — only the perpetual animation loop is frozen — so the
+    // scene remains visible and scroll-driven rotation (a deliberate user
+    // action) can still apply if desired later.
+    if (prefersReduced) {
+      meshRef.current.rotation.y = scrollProgress * Math.PI * 0.5
+      meshRef.current.position.y = 0
+      return
+    }
 
     // Subtle idle rotation — cinematic, not playful (per DESIGN.md)
     meshRef.current.rotation.y = clock.elapsedTime * 0.12 + scrollProgress * Math.PI * 0.5
@@ -38,7 +51,11 @@ export function HeroBottle({ scrollProgress = 0 }: HeroBottleProps) {
   })
 
   return (
-    <Float speed={0.6} rotationIntensity={0.08} floatIntensity={0.12}>
+    <Float
+      speed={prefersReduced ? 0 : 0.6}
+      rotationIntensity={prefersReduced ? 0 : 0.08}
+      floatIntensity={prefersReduced ? 0 : 0.12}
+    >
       {/* Placeholder geometry — replace with GLTF model in Sprint 2 */}
       <mesh ref={meshRef} castShadow receiveShadow>
         <cylinderGeometry args={[0.3, 0.35, 1.8, 64, 1, true]} />
