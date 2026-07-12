@@ -8,8 +8,9 @@
 'use client'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { useEffect, useRef, type ReactNode } from 'react'
+import { useEffect, type ReactNode } from 'react'
 import { initScrollEngine, destroyScrollEngine } from '@/lib/scroll/scrollEngine'
+import { prefersReducedMotion } from '@/utils/media'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,17 +30,15 @@ interface ProvidersProps {
  * Initialises the scroll engine on the client.
  */
 export function Providers({ children }: ProvidersProps) {
-  const scrollInitialised = useRef(false)
-
   useEffect(() => {
-    if (scrollInitialised.current) return
-    scrollInitialised.current = true
+    // Reduced motion check — skip smooth scroll if user prefers.
+    // If we never initialised (because the user prefers reduced motion),
+    // we must not call destroy — destroyScrollEngine() is a module-level
+    // singleton and calling it without a matching init is a needless no-op
+    // at best and a state-corruption risk if this ever gains side effects.
+    if (prefersReducedMotion()) return
 
-    // Reduced motion check — skip smooth scroll if user prefers
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (!prefersReduced) {
-      initScrollEngine()
-    }
+    initScrollEngine()
 
     return () => {
       destroyScrollEngine()

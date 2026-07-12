@@ -9,6 +9,7 @@
 
 import { useState, useEffect } from 'react'
 import type { ScrollProgress } from '@/types'
+import { prefersReducedMotion } from '@/utils/media'
 
 /**
  * Tracks scroll position and converts to normalised progress.
@@ -22,14 +23,16 @@ export function useScrollProgress(): ScrollProgress {
   })
 
   useEffect(() => {
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (prefersReduced) return
+    if (prefersReducedMotion()) return
 
     let lastY = window.scrollY
     let lastTime = performance.now()
-    let rafId: number
+    let rafId: number | null = null
 
     const onScroll = () => {
+      // Avoid stacking multiple in-flight rAF callbacks per scroll burst.
+      if (rafId !== null) return
+
       rafId = requestAnimationFrame(() => {
         const now = performance.now()
         const y = window.scrollY
@@ -43,6 +46,7 @@ export function useScrollProgress(): ScrollProgress {
 
         lastY = y
         lastTime = now
+        rafId = null
       })
     }
 
@@ -50,7 +54,7 @@ export function useScrollProgress(): ScrollProgress {
 
     return () => {
       window.removeEventListener('scroll', onScroll)
-      cancelAnimationFrame(rafId)
+      if (rafId !== null) cancelAnimationFrame(rafId)
     }
   }, [])
 

@@ -8,19 +8,16 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-
-function readPrefersReducedMotion(): boolean {
-  if (typeof window === 'undefined') return false
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
-}
+import { prefersReducedMotion, getReducedMotionMediaQuery } from '@/utils/media'
 
 export function useReducedMotion(): boolean {
   // Lazy initializer captures the correct value on first render,
   // avoiding a setState call inside the effect body.
-  const [prefersReduced, setPrefersReduced] = useState<boolean>(readPrefersReducedMotion)
+  const [prefersReduced, setPrefersReduced] = useState<boolean>(prefersReducedMotion)
 
   useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const mq = getReducedMotionMediaQuery()
+    if (!mq) return
 
     const onChange = (e: MediaQueryListEvent) => setPrefersReduced(e.matches)
     mq.addEventListener('change', onChange)
