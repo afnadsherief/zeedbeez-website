@@ -48,8 +48,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
           {/* Global navigation */}
           <Navigation />
 
-          {/* Page content */}
-          <main id="main-content" className="scroll-container relative" role="main">
+          {/* Page content — <main> has an implicit ARIA role of "main";
+              an explicit role attribute here would be redundant. */}
+          <main id="main-content" className="scroll-container relative">
             {children}
           </main>
 
