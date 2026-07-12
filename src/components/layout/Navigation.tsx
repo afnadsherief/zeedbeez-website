@@ -9,7 +9,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 const NAV_LINKS = [
   { label: 'Research', href: '/research' },
@@ -24,6 +24,24 @@ const NAV_LINKS = [
  */
 export function Navigation() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const menuToggleRef = useRef<HTMLButtonElement>(null)
+
+  // Escape closes the mobile menu and returns focus to the toggle button —
+  // per docs/17_ACCESSIBILITY.md keyboard-navigable requirement, found
+  // missing during the Phase 1 accessibility audit.
+  useEffect(() => {
+    if (!menuOpen) return
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMenuOpen(false)
+        menuToggleRef.current?.focus()
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [menuOpen])
 
   return (
     <header
@@ -72,6 +90,7 @@ export function Navigation() {
 
       {/* Mobile menu toggle */}
       <button
+        ref={menuToggleRef}
         type="button"
         className="md:hidden flex flex-col gap-1.5 p-2"
         aria-expanded={menuOpen}

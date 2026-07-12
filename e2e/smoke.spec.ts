@@ -24,3 +24,22 @@ test.describe('Homepage smoke test', () => {
     await expect(page.getByRole('link', { name: /discover products/i })).toBeVisible()
   })
 })
+
+test.describe('Mobile menu keyboard accessibility', () => {
+  test.use({ viewport: { width: 375, height: 812 } })
+
+  test('Escape closes the mobile menu and returns focus to the toggle button', async ({ page }) => {
+    await page.goto('/')
+
+    const toggle = page.getByRole('button', { name: /open menu/i })
+    await toggle.click()
+
+    const mobileNav = page.getByRole('navigation', { name: /mobile navigation/i })
+    await expect(mobileNav).toBeVisible()
+
+    await page.keyboard.press('Escape')
+
+    await expect(mobileNav).not.toBeVisible()
+    await expect(toggle).toBeFocused()
+  })
+})
