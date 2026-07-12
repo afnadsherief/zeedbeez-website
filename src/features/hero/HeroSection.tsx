@@ -8,12 +8,24 @@
 
 'use client'
 
-import { useRef, useEffect } from 'react'
+import { useRef } from 'react'
+import dynamic from 'next/dynamic'
+import { useGSAP } from '@gsap/react'
 import { gsap } from 'gsap'
-import { HeroScene } from './components/HeroScene'
 import { useScrollProgress } from '@/hooks/useScrollProgress'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { DURATIONS, GSAP_EASES } from '@/lib/motion/timings'
+
+/**
+ * HeroScene (Three.js/R3F/drei — the largest client bundle in the app) is
+ * loaded dynamically so the LCP-critical headline/copy above renders and
+ * paints immediately, without waiting on the 3D engine to download and
+ * initialise. `ssr: false` is required because R3F's Canvas touches
+ * WebGL/window APIs that do not exist on the server.
+ */
+const HeroScene = dynamic(() => import('./components/HeroScene').then((mod) => mod.HeroScene), {
+  ssr: false,
+})
 
 /**
  * HeroSection renders the 3D canvas fixed behind the editorial overlay.
@@ -23,38 +35,35 @@ export function HeroSection() {
   const { progress } = useScrollProgress()
   const prefersReduced = useReducedMotion()
 
-  const headlineRef = useRef<HTMLHeadingElement>(null)
-  const subtitleRef = useRef<HTMLParagraphElement>(null)
-  const ctaRef = useRef<HTMLDivElement>(null)
-  const eyebrowRef = useRef<HTMLParagraphElement>(null)
+  const containerRef = useRef<HTMLElement>(null)
 
-  // Entrance animation — GSAP stagger reveal
-  useEffect(() => {
-    if (prefersReduced) return
+  // Entrance animation — GSAP stagger reveal.
+  // useGSAP scopes selectors to containerRef and auto-reverts the animation
+  // context on unmount/re-run, which raw useEffect + gsap.fromTo does not
+  // guarantee (no cleanup was being returned previously).
+  useGSAP(
+    () => {
+      if (prefersReduced) return
 
-    const targets = [
-      eyebrowRef.current,
-      headlineRef.current,
-      subtitleRef.current,
-      ctaRef.current,
-    ].filter(Boolean)
-
-    gsap.fromTo(
-      targets,
-      { opacity: 0, y: 32 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: DURATIONS.premium,
-        ease: GSAP_EASES.reveal,
-        stagger: 0.12,
-        delay: 0.4,
-      },
-    )
-  }, [prefersReduced])
+      gsap.fromTo(
+        '[data-hero-reveal]',
+        { opacity: 0, y: 32 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: DURATIONS.premium,
+          ease: GSAP_EASES.reveal,
+          stagger: 0.12,
+          delay: 0.4,
+        },
+      )
+    },
+    { scope: containerRef, dependencies: [prefersReduced] },
+  )
 
   return (
     <section
+      ref={containerRef}
       className="relative min-h-screen w-full overflow-hidden"
       aria-label="Hero — ZeedBeez Premium Wellness"
     >
@@ -71,7 +80,7 @@ export function HeroSection() {
       <div className="relative z-10 flex flex-col justify-end min-h-screen pb-24 px-8 md:px-16 lg:px-24 max-w-7xl mx-auto">
         {/* Eyebrow */}
         <p
-          ref={eyebrowRef}
+          data-hero-reveal
           className="text-xs tracking-widest uppercase text-gold-400 mb-6 opacity-0"
         >
           Biotechnology Wellness
@@ -79,7 +88,7 @@ export function HeroSection() {
 
         {/* Headline */}
         <h1
-          ref={headlineRef}
+          data-hero-reveal
           className="font-display text-5xl md:text-7xl lg:text-8xl font-light tracking-tight text-content-primary leading-none mb-6 opacity-0 max-w-3xl"
         >
           Nature.
@@ -89,14 +98,14 @@ export function HeroSection() {
 
         {/* Subtitle */}
         <p
-          ref={subtitleRef}
+          data-hero-reveal
           className="text-base md:text-lg text-content-secondary max-w-md leading-relaxed mb-10 opacity-0"
         >
           Premium biotechnology wellness rooted in science, designed for the demands of modern life.
         </p>
 
         {/* CTA */}
-        <div ref={ctaRef} className="flex items-center gap-4 opacity-0">
+        <div data-hero-reveal className="flex items-center gap-4 opacity-0">
           <a
             href="/products"
             className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-black text-sm font-medium tracking-wide px-7 py-3.5 rounded-md transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2"
