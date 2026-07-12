@@ -13,9 +13,19 @@ gsap.registerPlugin(ScrollTrigger)
 
 let lenis: Lenis | null = null
 
+// Named references to the ticker/refresh callbacks so destroyScrollEngine()
+// can actually remove them. Previously these were anonymous inline
+// functions passed to gsap.ticker.add()/ScrollTrigger.addEventListener(),
+// which meant destroy() had no way to unregister them — each
+// init→destroy cycle (StrictMode double-invoke, hot reload, or any future
+// multi-mount) permanently stacked another ticker callback, each holding a
+// closure over a stale `lenis` instance. Fixed by naming and removing them.
+let tickerCallback: ((time: number) => void) | null = null
+let refreshCallback: (() => void) | null = null
+
 export function initScrollEngine(): Lenis {
   if (lenis) {
-    lenis.destroy()
+    destroyScrollEngine()
   }
 
   lenis = new Lenis({
@@ -26,10 +36,10 @@ export function initScrollEngine(): Lenis {
     infinite: false,
   })
 
-  gsap.ticker.add((time) => {
+  tickerCallback = (time: number) => {
     lenis?.raf(time * 1000)
-  })
-
+  }
+  gsap.ticker.add(tickerCallback)
   gsap.ticker.lagSmoothing(0)
 
   lenis.on('scroll', ScrollTrigger.update)
@@ -47,13 +57,24 @@ export function initScrollEngine(): Lenis {
     pinType: document.documentElement.style.transform ? 'transform' : 'fixed',
   })
 
-  ScrollTrigger.addEventListener('refresh', () => lenis?.resize())
+  refreshCallback = () => lenis?.resize()
+  ScrollTrigger.addEventListener('refresh', refreshCallback)
   ScrollTrigger.refresh()
 
   return lenis
 }
 
 export function destroyScrollEngine(): void {
+  if (tickerCallback) {
+    gsap.ticker.remove(tickerCallback)
+    tickerCallback = null
+  }
+
+  if (refreshCallback) {
+    ScrollTrigger.removeEventListener('refresh', refreshCallback)
+    refreshCallback = null
+  }
+
   lenis?.destroy()
   lenis = null
   ScrollTrigger.killAll()
