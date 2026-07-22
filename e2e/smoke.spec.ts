@@ -19,9 +19,11 @@ test.describe('Homepage smoke test', () => {
     await expect(nav).toBeVisible()
   })
 
-  test('CTA buttons are present', async ({ page }) => {
+  test('CTA buttons remain visible on mobile', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 })
     await page.goto('/')
     await expect(page.getByRole('link', { name: /discover products/i })).toBeVisible()
+    await expect(page.getByRole('link', { name: /the science/i })).toBeVisible()
   })
 })
 
@@ -41,5 +43,21 @@ test.describe('Mobile menu keyboard accessibility', () => {
 
     await expect(mobileNav).not.toBeVisible()
     await expect(toggle).toBeFocused()
+  })
+
+  test('keeps keyboard focus inside the open mobile menu', async ({ page }) => {
+    await page.goto('/')
+
+    await page.getByRole('button', { name: /open menu/i }).click()
+
+    const firstLink = page.getByRole('link', { name: 'Research', exact: true })
+    const lastLink = page.getByRole('link', { name: 'Shop Now', exact: true })
+
+    await firstLink.focus()
+    await page.keyboard.press('Shift+Tab')
+    await expect(lastLink).toBeFocused()
+
+    await page.keyboard.press('Tab')
+    await expect(firstLink).toBeFocused()
   })
 })
