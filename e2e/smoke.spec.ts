@@ -1,5 +1,21 @@
 import { test, expect } from '@playwright/test'
 
+const PUBLIC_ROUTES = [
+  '/research',
+  '/products',
+  '/products/zeedbeez-pro',
+  '/products/sleep-better',
+  '/products/hypermoon',
+  '/products/herbze',
+  '/ingredients',
+  '/story',
+  '/manufacturing',
+  '/sustainability',
+  '/contact',
+  '/privacy',
+  '/terms',
+] as const
+
 test.describe('Homepage smoke test', () => {
   test('loads successfully and shows hero content', async ({ page }) => {
     await page.goto('/')
@@ -17,6 +33,13 @@ test.describe('Homepage smoke test', () => {
     await page.goto('/')
     const nav = page.getByRole('banner')
     await expect(nav).toBeVisible()
+  })
+
+  test('serves every public navigation destination', async ({ page }) => {
+    for (const route of PUBLIC_ROUTES) {
+      const response = await page.goto(route)
+      await expect(response?.status(), `${route} should not return an error`).toBe(200)
+    }
   })
 
   test('CTA buttons remain visible on mobile', async ({ page }) => {
