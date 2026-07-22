@@ -12,6 +12,7 @@
 
 import { Canvas } from '@react-three/fiber'
 import { Suspense, type ReactNode } from 'react'
+import { PCFShadowMap } from 'three'
 import { getAdaptivePixelRatio, getQualityTier } from '@/three/performance/qualityManager'
 
 interface SceneManagerProps {
@@ -51,7 +52,7 @@ export function SceneManager({ children, interactive = false, className }: Scene
           depth: true,
         }}
         camera={{ fov: 45, near: 0.1, far: 100, position: [0, 0, 4] }}
-        shadows={tier !== 'low'}
+        shadows={tier === 'low' ? false : { type: PCFShadowMap }}
         performance={{ min: 0.5 }}
         fallback={null}
       >
