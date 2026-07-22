@@ -11,7 +11,6 @@
 'use client'
 
 import { Canvas } from '@react-three/fiber'
-import { Preload } from '@react-three/drei'
 import { Suspense, type ReactNode } from 'react'
 import { getAdaptivePixelRatio, getQualityTier } from '@/three/performance/qualityManager'
 
@@ -25,8 +24,12 @@ interface SceneManagerProps {
 
 /**
  * SceneManager wraps every R3F scene.
- * It applies adaptive pixel ratio, performance defaults, and error boundaries.
- * Do not create Canvas elements outside of this component.
+ * It applies adaptive pixel ratio and performance defaults.
+ *
+ * Assets are intentionally not preloaded globally: scenes own the assets they
+ * need, so the LCP-critical page does not eagerly fetch future or off-screen
+ * models and textures. The semantic HTML experience remains available while a
+ * decorative WebGL scene is loading or unavailable.
  */
 export function SceneManager({ children, interactive = false, className }: SceneManagerProps) {
   const tier = getQualityTier()
@@ -50,9 +53,9 @@ export function SceneManager({ children, interactive = false, className }: Scene
         camera={{ fov: 45, near: 0.1, far: 100, position: [0, 0, 4] }}
         shadows={tier !== 'low'}
         performance={{ min: 0.5 }}
+        fallback={null}
       >
         <Suspense fallback={null}>{children}</Suspense>
-        <Preload all />
       </Canvas>
     </div>
   )
