@@ -37,10 +37,6 @@ export function HeroSection() {
 
   const containerRef = useRef<HTMLElement>(null)
 
-  // Entrance animation — GSAP stagger reveal.
-  // useGSAP scopes selectors to containerRef and auto-reverts the animation
-  // context on unmount/re-run, which raw useEffect + gsap.fromTo does not
-  // guarantee (no cleanup was being returned previously).
   useGSAP(
     () => {
       if (prefersReduced) return
@@ -64,69 +60,61 @@ export function HeroSection() {
   return (
     <section
       ref={containerRef}
-      className="relative min-h-screen w-full overflow-hidden"
+      className="relative min-h-screen min-h-[100svh] w-full overflow-hidden"
       aria-label="Hero — ZeedBeez Premium Wellness"
     >
-      {/* 3D Canvas Layer */}
       <HeroScene scrollProgress={progress} />
 
-      {/* Gradient overlay — pulls content from dark canvas */}
       <div
         className="absolute inset-0 bg-gradient-to-b from-void/20 via-transparent to-void/60 pointer-events-none"
         aria-hidden="true"
       />
 
-      {/* Editorial Content */}
-      <div className="relative z-10 flex flex-col justify-end min-h-screen pb-24 px-8 md:px-16 lg:px-24 max-w-7xl mx-auto">
-        {/* Eyebrow */}
+      <div className="relative z-10 mx-auto flex min-h-screen min-h-[100svh] max-w-7xl flex-col justify-end px-6 pb-28 sm:px-8 sm:pb-24 md:px-16 lg:px-24">
         <p
           data-hero-reveal
-          className="text-xs tracking-widest uppercase text-gold-400 mb-6 opacity-0"
+          className="mb-5 text-xs tracking-widest uppercase text-gold-400 opacity-0 sm:mb-6"
         >
           Biotechnology Wellness
         </p>
 
-        {/* Headline */}
         <h1
           data-hero-reveal
-          className="font-display text-5xl md:text-7xl lg:text-8xl font-light tracking-tight text-content-primary leading-none mb-6 opacity-0 max-w-3xl"
+          className="mb-5 max-w-3xl font-display text-5xl font-light leading-none tracking-tight text-content-primary opacity-0 md:text-7xl lg:text-8xl"
         >
           Nature.
           <br />
-          <span className="text-gold-400 italic">Refined.</span>
+          <span className="italic text-gold-400">Refined.</span>
         </h1>
 
-        {/* Subtitle */}
         <p
           data-hero-reveal
-          className="text-base md:text-lg text-content-secondary max-w-md leading-relaxed mb-10 opacity-0"
+          className="mb-8 max-w-md text-base leading-relaxed text-content-secondary opacity-0 sm:mb-10 md:text-lg"
         >
           Premium biotechnology wellness rooted in science, designed for the demands of modern life.
         </p>
 
-        {/* CTA */}
-        <div data-hero-reveal className="flex items-center gap-4 opacity-0">
+        <div data-hero-reveal className="flex flex-col items-stretch gap-3 opacity-0 sm:flex-row sm:items-center sm:gap-4">
           <a
             href="/products"
-            className="inline-flex items-center gap-2 bg-gold-500 hover:bg-gold-400 text-black text-sm font-medium tracking-wide px-7 py-3.5 rounded-md transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-gold-500 px-7 py-3.5 text-sm font-medium tracking-wide text-black transition-colors duration-300 hover:bg-gold-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-400"
           >
             Discover Products
           </a>
           <a
             href="/research"
-            className="inline-flex items-center gap-2 border border-glass-border text-content-secondary hover:text-content-primary hover:border-glass-heavy text-sm tracking-wide px-7 py-3.5 rounded-md transition-all duration-300 backdrop-blur-sm"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-glass-border px-7 py-3.5 text-sm tracking-wide text-content-secondary backdrop-blur-sm transition-all duration-300 hover:border-glass-heavy hover:text-content-primary"
           >
             The Science
           </a>
         </div>
 
-        {/* Scroll indicator */}
         <div
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+          className="absolute bottom-8 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 sm:flex"
           aria-hidden="true"
         >
           <span className="text-xs tracking-widest text-content-disabled uppercase">Scroll</span>
-          <div className="w-px h-8 bg-gradient-to-b from-content-disabled to-transparent" />
+          <div className="h-8 w-px bg-gradient-to-b from-content-disabled to-transparent" />
         </div>
       </div>
     </section>
