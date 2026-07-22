@@ -25,6 +25,11 @@ test.describe('Homepage smoke test', () => {
     await expect(page.getByRole('link', { name: /discover products/i })).toBeVisible()
     await expect(page.getByRole('link', { name: /the science/i })).toBeVisible()
   })
+
+  test('serves the default share image', async ({ page }) => {
+    const response = await page.goto('/opengraph-image')
+    await expect(response?.headers()['content-type']).toContain('image/png')
+  })
 })
 
 test.describe('Mobile menu keyboard accessibility', () => {
