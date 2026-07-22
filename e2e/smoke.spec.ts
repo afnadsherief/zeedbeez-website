@@ -55,8 +55,9 @@ test.describe('Mobile menu keyboard accessibility', () => {
 
     await page.getByRole('button', { name: /open menu/i }).click()
 
-    const firstLink = page.getByRole('link', { name: 'Research', exact: true })
-    const lastLink = page.getByRole('link', { name: 'Shop Now', exact: true })
+    const mobileNav = page.getByRole('navigation', { name: /mobile navigation/i })
+    const firstLink = mobileNav.getByRole('link', { name: 'Research', exact: true })
+    const lastLink = mobileNav.getByRole('link', { name: 'Shop Now', exact: true })
 
     await firstLink.focus()
     await page.keyboard.press('Shift+Tab')

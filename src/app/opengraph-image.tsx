@@ -16,78 +16,77 @@ export const contentType = 'image/png'
  */
 export default function OpenGraphImage() {
   return new ImageResponse(
-    (
+    <div
+      style={{
+        alignItems: 'center',
+        background: '#080808',
+        color: '#ffffff',
+        display: 'flex',
+        height: '100%',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        position: 'relative',
+        width: '100%',
+      }}
+    >
       <div
         style={{
-          alignItems: 'center',
-          background: '#080808',
-          color: '#ffffff',
+          background: 'radial-gradient(circle, rgba(251,191,36,0.28), rgba(251,191,36,0) 68%)',
+          borderRadius: '9999px',
+          height: '900px',
+          position: 'absolute',
+          right: '-260px',
+          top: '-190px',
+          width: '900px',
+        }}
+      />
+      <div
+        style={{
+          border: '1px solid rgba(251,191,36,0.38)',
           display: 'flex',
-          height: '100%',
-          justifyContent: 'center',
-          overflow: 'hidden',
+          flexDirection: 'column',
+          gap: '24px',
+          margin: '64px',
+          padding: '72px',
           position: 'relative',
           width: '100%',
         }}
       >
         <div
           style={{
-            background: 'radial-gradient(circle, rgba(251,191,36,0.28), rgba(251,191,36,0) 68%)',
-            borderRadius: '9999px',
-            height: '900px',
-            position: 'absolute',
-            right: '-260px',
-            top: '-190px',
-            width: '900px',
-          }}
-        />
-        <div
-          style={{
-            border: '1px solid rgba(251,191,36,0.38)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '24px',
-            margin: '64px',
-            padding: '72px',
-            position: 'relative',
-            width: '100%',
+            color: '#fbbf24',
+            fontSize: 24,
+            letterSpacing: '0.22em',
+            textTransform: 'uppercase',
           }}
         >
-          <div
-            style={{
-              color: '#fbbf24',
-              fontSize: 24,
-              letterSpacing: '0.22em',
-              textTransform: 'uppercase',
-            }}
-          >
-            ZeedBeez
-          </div>
-          <div
-            style={{
-              fontSize: 76,
-              letterSpacing: '-0.04em',
-              lineHeight: 1,
-              maxWidth: '820px',
-            }}
-          >
-            Nature.
-            <br />
-            <span style={{ color: '#fbbf24' }}>Refined.</span>
-          </div>
-          <div
-            style={{
-              color: 'rgba(255,255,255,0.72)',
-              fontSize: 28,
-              lineHeight: 1.35,
-              maxWidth: '760px',
-            }}
-          >
-            Premium biotechnology wellness rooted in science.
-          </div>
+          ZeedBeez
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            fontSize: 76,
+            letterSpacing: '-0.04em',
+            lineHeight: 1,
+            maxWidth: '820px',
+          }}
+        >
+          <span>Nature.</span>
+          <span style={{ color: '#fbbf24' }}>Refined.</span>
+        </div>
+        <div
+          style={{
+            color: 'rgba(255,255,255,0.72)',
+            fontSize: 28,
+            lineHeight: 1.35,
+            maxWidth: '760px',
+          }}
+        >
+          Premium biotechnology wellness rooted in science.
         </div>
       </div>
-    ),
+    </div>,
     { ...size },
   )
 }
