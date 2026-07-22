@@ -69,6 +69,6 @@ export const SITE_META = {
   description:
     'Nature-inspired biotechnology wellness products. Backed by research. Designed for performance.',
   url: process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://zeedbeez.com',
-  ogImage: '/og/default.jpg',
+  ogImage: '/opengraph-image',
   twitterHandle: '@zeedbeez',
 } as const
